@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generar Aviso - Autenticación</title>
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Archivos de datos JS local -->
+    <script src="usuarios.js"></script>
+    <script src="ubicaciones.js"></script>
+    <script src="codigos_sap.js"></script>
+</head>
+<body>
+    <div class="container">
+        
+        <!-- VENTANA 1: LOGIN DE USUARIOS -->
+        <div id="loginSection">
+            <header>
+                <h1>GENERAR AVISO</h1>
+                <p style="color: #bdc3c7; margin-top: 5px;">Inicio de Sesión</p>
+            </header>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginUsuario">Legajo:</label>
+                    <input type="text" id="loginUsuario" required placeholder="Ingrese su usuario">
+                </div>
+
+                <div class="form-group">
+                    <label for="loginContrasena">Contraseña:</label>
+                    <input type="password" id="loginContrasena" required placeholder="Ingrese su contraseña">
+                </div>
+
+                <div id="loginError" style="color: #e74c3c; display: none; margin-bottom: 15px; font-weight: bold; text-align: center;">
+                    Usuario o contraseña incorrectos.
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" id="loginButton">Ingresar</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- VENTANA 2: FORMULARIO DE CARGA (OCULTO AL INICIO) -->
+        <div id="formSection" style="display: none;">
+            <header>
+                <h1>Registro de Intervención</h1>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                    <span id="userGreeting" style="color: #e67e22; font-weight: bold;"></span>
+                    <button id="logoutButton" type="button" style="width: auto; padding: 5px 12px; font-size: 0.8em; background-color: #7f8c8d;">Cerrar Sesión</button>
+                </div>
+            </header>
+            
+            <form id="dataForm">
+                <div class="form-group">
+                    <label for="ubicacionTecnica">Ubicación Técnica:</label>
+                    <select id="ubicacionTecnica" name="ubicacionTecnica" required>
+                        <option value="">Seleccione una ubicación...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="fecha">Fecha:</label>
+                    <input type="date" id="fecha" name="fecha" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="titulo">Título:</label>
+                    <input type="text" id="titulo" name="titulo" placeholder="Ej: Revisión Motor Principal" maxlength="50" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="descripcion">Descripción:</label>
+                    <textarea id="descripcion" name="descripcion" rows="5" placeholder="Describa la intervención..." required></textarea>
+                </div>
+
+                <fieldset class="form-group-fieldset">
+                    <legend>Recursos</legend>
+                    <div class="form-group">
+                        <label for="horas">HS (Horas Estimadas del Trabajo):</label>
+                        <input type="number" id="horas" name="horas" placeholder="Ej: 8" step="0.5">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hh">HH (Cantidad de Personas):</label>
+                        <input type="number" id="hh" name="hh" placeholder="Ej: 2">
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <div>
+                            <input type="checkbox" id="requireGrua" name="requireGrua" value="Sí">
+                            <label for="requireGrua" class="checkbox-label">Requiere Grúa</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="requireAndamio" name="requireAndamio" value="Sí">
+                            <label for="requireAndamio" class="checkbox-label">Requiere Andamio</label>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <div class="form-group checkbox-group">
+                    <label>Estado:</label>
+                    <div>
+                        <input type="checkbox" id="realizado" name="realizado" value="Realizado">
+                        <label for="realizado" class="checkbox-label">Realizado</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="cambiar" name="cambiar" value="Cambiar">
+                        <label for="cambiar" class="checkbox-label">Requiere Cambio/Revisión</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="codigoSap">Código SAP Material:</label>
+                    <select id="codigoSap" name="codigoSap">
+                        <option value="">código SAP...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" id="submitButton">Cargar Aviso</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

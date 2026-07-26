@@ -1,0 +1,221 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&family=Orbitron:wght@500;700&display=swap');
+
+body {
+    font-family: 'Roboto Condensed', sans-serif;
+    background-color: #2c3e50; /* Azul oscuro/grisáceo */
+    color: #ecf0f1; /* Gris claro casi blanco */
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Para que se alinee arriba si el contenido es largo */
+    min-height: 100vh;
+}
+.form-group input[type="password"] {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #4a627a;
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1em;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input[type="password"]:focus {
+    outline: none;
+    border-color: #e67e22;
+    box-shadow: 0 0 0 2px rgba(230, 126, 34, 0.3);
+}
+.container {
+    background-color: #34495e; /* Azul grisáceo más claro */
+    padding: 30px 40px;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    width: 100%;
+    max-width: 700px;
+    border-top: 5px solid #e67e22; /* Naranja industrial */
+}
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #4a627a;
+    padding-bottom: 20px;
+}
+
+header h1 {
+    font-family: 'Orbitron', sans-serif;
+    color: #e67e22; /* Naranja industrial */
+    font-size: 2.5em;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #bdc3c7; /* Gris más claro */
+    font-size: 0.95em;
+}
+
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group input[type="number"], /* Añadido para los nuevos campos numéricos */
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #4a627a; /* Borde gris oscuro */
+    background-color: #2c3e50; /* Fondo de input oscuro */
+    color: #ecf0f1; /* Texto del input claro */
+    border-radius: 4px;
+    box-sizing: border-box; /* Importante para que padding no afecte el width */
+    font-size: 1em;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="date"]:focus,
+.form-group input[type="number"]:focus, /* Añadido para los nuevos campos numéricos */
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #e67e22; /* Naranja industrial al enfocar */
+    box-shadow: 0 0 0 2px rgba(230, 126, 34, 0.3); /* Sombra sutil naranja */
+}
+
+.form-group textarea {
+    resize: vertical; /* Permitir redimensionar verticalmente */
+    min-height: 100px;
+}
+
+/* Estilo para date input picker */
+.form-group input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.8) sepia(1) saturate(5) hue-rotate(330deg); /* Intenta colorear el icono */
+    cursor: pointer;
+}
+
+
+.checkbox-group {
+    display: flex;
+    flex-direction: column; /* Alinea los checkboxes verticalmente */
+}
+
+.checkbox-group > label { /* Etiqueta principal "Estado:" o para la sección de recursos si se usa */
+    margin-bottom: 10px;
+}
+
+.checkbox-group div {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px; /* Espacio entre opciones de checkbox */
+}
+
+.checkbox-group input[type="checkbox"] {
+    margin-right: 10px;
+    appearance: none; /* Quitar apariencia nativa */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #4a627a;
+    border-radius: 3px;
+    background-color: #2c3e50;
+    cursor: pointer;
+    position: relative; /* Para el pseudo-elemento ::after */
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.checkbox-group input[type="checkbox"]:checked {
+    background-color: #e67e22; /* Naranja industrial */
+    border-color: #e67e22;
+}
+
+.checkbox-group input[type="checkbox"]:checked::after {
+    content: '✔'; /* O '\2713' */
+    font-size: 16px;
+    color: #2c3e50; /* Color del checkmark */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: bold;
+}
+
+.checkbox-group .checkbox-label {
+    color: #bdc3c7;
+    font-weight: normal;
+    cursor: pointer;
+    font-size: 0.9em;
+    margin-bottom: 0; /* Reset margin para label de checkbox */
+}
+
+/* Estilos para fieldset y legend */
+.form-group-fieldset {
+    border: 1px solid #4a627a;
+    border-radius: 4px;
+    padding: 20px;
+    margin-bottom: 25px; /* Igual que .form-group */
+    background-color: rgba(0,0,0,0.1); /* Un poco más oscuro para destacar la sección */
+}
+
+.form-group-fieldset legend {
+    font-family: 'Orbitron', sans-serif;
+    color: #e67e22; /* Naranja industrial */
+    font-weight: 700;
+    padding: 0 10px;
+    font-size: 1.2em;
+    margin-left: 10px; /* Para alinear un poco */
+}
+
+
+button[type="submit"] {
+    background-color: #e67e22; /* Naranja industrial */
+    color: #fff;
+    font-family: 'Orbitron', sans-serif;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.1em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    display: block;
+    width: 100%;
+    margin-top: 10px; /* Espacio adicional antes del botón */
+}
+
+button[type="submit"]:hover {
+    background-color: #d35400; /* Naranja más oscuro al pasar el mouse */
+}
+
+button[type="submit"]:active {
+    transform: translateY(1px); /* Efecto de presionado */
+}
+
+/* Estilo para placeholder */
+::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  color: #7f8c8d;
+  opacity: 0.7;
+}
+::-moz-placeholder { /* Firefox 19+ */
+  color: #7f8c8d;
+  opacity: 0.7;
+}
+:-ms-input-placeholder { /* IE 10+ */
+  color: #7f8c8d;
+  opacity: 0.7;
+}
+:-moz-placeholder { /* Firefox 18- */
+  color: #7f8c8d;
+  opacity: 0.7;
+}
