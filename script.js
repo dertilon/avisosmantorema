@@ -40,13 +40,23 @@ document.addEventListener('DOMContentLoaded', function() {
                     ubicacionSelect.appendChild(opt);
                 });
 
-                codigoSapSelect.innerHTML = '<option value="">Código SAP...</option>';
-                data.codigosSap.forEach(sap => {
-                    const opt = document.createElement('option');
-                    opt.value = sap;
-                    opt.textContent = sap;
-                    codigoSapSelect.appendChild(opt);
-                });
+                // Llenar select de Códigos SAP combinados
+codigoSapSelect.innerHTML = '<option value="">Código SAP...</option>';
+data.codigosSap.forEach(item => {
+    const opt = document.createElement('option');
+    
+    // Si viene como objeto { codigo, etiqueta }
+    if (typeof item === 'object') {
+        opt.value = item.codigo;        // Guarda el código (ej: 33650)
+        opt.textContent = item.etiqueta; // Muestra en pantalla: 33650 - trapo
+    } else {
+        // Compatibilidad por si viene como texto simple
+        opt.value = item;
+        opt.textContent = item;
+    }
+    
+    codigoSapSelect.appendChild(opt);
+});
             }
         } catch (error) {
             console.error("Error al cargar parámetros:", error);
@@ -132,6 +142,8 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     async function enviarAvisoAGoogleSheets(data, year, mm, dd) {
+        const mensajeExito = document.getElementById('mensajeExito');
+
         try {
             const response = await fetch(URL_CARGA_AVISOS, {
                 method: 'POST',
@@ -144,7 +156,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await response.json();
 
             if (result.status === "success") {
-                alert('Aviso cargado exitosamente.');
+                // Mostrar el cartel verde de éxito
+                if (mensajeExito) {
+                    mensajeExito.style.display = 'block';
+                    // Ocultar automáticamente después de 4 segundos
+                    setTimeout(() => {
+                        mensajeExito.style.display = 'none';
+                    }, 4000);
+                }
+
+                // Resetear campos del formulario
                 dataForm.reset();
                 fechaInput.value = `${year}-${mm}-${dd}`;
                 ubicacionSelect.value = "";
@@ -158,5 +179,6 @@ document.addEventListener('DOMContentLoaded', function() {
             submitButton.disabled = false;
             submitButton.textContent = 'Cargar Aviso';
         }
+    
     }
 });
