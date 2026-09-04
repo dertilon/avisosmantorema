@@ -3,18 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generar Aviso - Autenticación</title>
+    <title>Generar Aviso - Sistema</title>
     <link rel="stylesheet" href="style.css">
 
-    <!-- Archivos de datos JS local -->
+    <!-- Cargar archivo de usuarios local -->
     <script src="usuarios.js"></script>
-    <script src="ubicaciones.js"></script>
-    <script src="codigos_sap.js"></script>
 </head>
 <body>
     <div class="container">
         
-        <!-- VENTANA 1: LOGIN DE USUARIOS -->
+        <!-- VENTANA 1: LOGIN -->
         <div id="loginSection">
             <header>
                 <h1>GENERAR AVISO</h1>
@@ -22,8 +20,8 @@
             </header>
             <form id="loginForm">
                 <div class="form-group">
-                    <label for="loginUsuario">Legajo:</label>
-                    <input type="text" id="loginUsuario" required placeholder="Ingrese su usuario">
+                    <label for="loginUsuario">Legajo / Usuario:</label>
+                    <input type="text" id="loginUsuario" required placeholder="Ingrese su legajo">
                 </div>
 
                 <div class="form-group">
@@ -36,12 +34,12 @@
                 </div>
 
                 <div class="form-group">
-                    <button type="submit" id="loginButton">Ingresar</button>
+                    <button type="submit" id="loginButton">INGRESAR</button>
                 </div>
             </form>
         </div>
 
-        <!-- VENTANA 2: FORMULARIO DE CARGA (OCULTO AL INICIO) -->
+        <!-- VENTANA 2: FORMULARIO -->
         <div id="formSection" style="display: none;">
             <header>
                 <h1>Registro de Intervención</h1>
@@ -110,22 +108,24 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="codigoSap">Código SAP Material:</label>
-                    <select id="codigoSap" name="codigoSap">
-                        <option value="">código SAP...</option>
-                    </select>
+                <!-- Buscador de Repuestos SAP personalizado -->
+                <div class="form-group sap-autocomplete-container">
+                    <label for="codigoSapInput">Código SAP Material/Servicio:</label>
+                    <input type="text" id="codigoSapInput" placeholder="Escriba código o nombre (ej: rod, trapo, 33650)..." autocomplete="off">
+                    <input type="hidden" id="codigoSap" name="codigoSap">
+                    <div id="sapDropdownList" class="sap-dropdown-list"></div>
+                </div>
+
+                <div id="mensajeExito" style="display: none; background-color: #27ae60; color: #ffffff; padding: 12px; border-radius: 4px; text-align: center; font-weight: bold; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; margin-bottom: 15px;">
+                    ✔ ¡AVISO CARGADO EXITOSAMENTE!
                 </div>
 
                 <div class="form-group">
-                    <button type="submit" id="submitButton">Cargar Aviso</button>
+                    <button type="submit" id="submitButton">CARGAR AVISO</button>
                 </div>
-                <!-- Contenedor del mensaje de confirmación -->
-            <div id="mensajeExito" style="display: none; background-color: #27ae60; color: #ffffff; padding: 12px; border-radius: 4px; text-align: center; font-weight: bold; font-family: 'Orbitron', sans-serif; letter-spacing: 1px; margin-top: 15px;">
-                ✔ AVISO CARGADO EXITOSAMENTE
-            </div>
             </form>
         </div>
+
     </div>
     <script src="script.js"></script>
 </body>
