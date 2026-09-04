@@ -19,29 +19,36 @@ document.addEventListener('DOMContentLoaded', function() {
     const submitButton = document.getElementById('submitButton');
 
     // URLs de Apps Script
-    const URL_DATOS_SHEET = 'https://script.google.com/macros/s/AKfycbz0ERYdadHJLRkcS_bIJfLrDEeP-iK_G2XwMJ4QpIuplovy5K1cQX1LXCcqyRUzzK4RoQ/exec';
+    const URL_DATOS_SHEET = 'https://script.google.com/macros/s/AKfycbz0LWPbHck36KROtykqidL7GMm9YtMCFU0LmBrScnV-8MdFzjzTf7X_vkNtHoGWQtPG/exec';
     const URL_CARGA_AVISOS = 'https://script.google.com/macros/s/AKfycbx6I3SxdliiDcHtR1r-xj6WOALR1Zh60spuV1n2ZSHZylfy8ZAOClaug904EH0md17n/exec';
 
     let LISTA_SAP_GLOBAL = [];
     let usuarioActual = "";
 
-    // 1. CARGA DINÁMICA DE UBICACIONES Y SAP DESDE GOOGLE SHEETS
+    // -------------------------------------------------------------
+    // 1. CARGA DE UBICACIONES TÉCNICAS (DESDE UBICACIONES.JS)
+    // -------------------------------------------------------------
+    if (typeof UBICACIONES_DATA !== 'undefined' && Array.isArray(UBICACIONES_DATA)) {
+        ubicacionSelect.innerHTML = '<option value="">Seleccione una ubicación...</option>';
+        UBICACIONES_DATA.forEach(ubi => {
+            const opt = document.createElement('option');
+            opt.value = ubi;
+            opt.textContent = ubi;
+            ubicacionSelect.appendChild(opt);
+        });
+    } else {
+        console.warn("No se encontró el array UBICACIONES_DATA en ubicaciones.js");
+    }
+
+    // -------------------------------------------------------------
+    // 2. CARGA DE REPUESTOS SAP (DESDE GOOGLE SHEETS)
+    // -------------------------------------------------------------
     async function cargarParametrosDesdeSheets() {
         try {
             const response = await fetch(URL_DATOS_SHEET);
             const data = await response.json();
 
-            if (data.status === "success") {
-                // Llenar select de ubicaciones
-                ubicacionSelect.innerHTML = '<option value="">Seleccione una ubicación...</option>';
-                data.ubicaciones.forEach(ubi => {
-                    const opt = document.createElement('option');
-                    opt.value = ubi;
-                    opt.textContent = ubi;
-                    ubicacionSelect.appendChild(opt);
-                });
-
-                // Llenar array para el buscador predictivo SAP
+            if (data.status === "success" && data.codigosSap) {
                 LISTA_SAP_GLOBAL = data.codigosSap.map(item => {
                     if (typeof item === 'object') {
                         return { codigo: item.codigo, etiqueta: item.etiqueta };
@@ -50,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         } catch (error) {
-            console.error("Error al cargar parámetros:", error);
+            console.error("Error al cargar repuestos SAP desde Google Sheets:", error);
         }
     }
 
@@ -104,20 +111,18 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // -------------------------------------------------------------
-    // 2. VALIDACIÓN DE LOGIN (DESDE USUARIOS.JS)
+    // 3. VALIDACIÓN DE LOGIN (DESDE USUARIOS.JS)
     // -------------------------------------------------------------
     loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const userInput = String(loginUsuario.value).trim();
         const passInput = String(loginContrasena.value).trim();
 
-        // Verifica que usuarios.js haya cargado el arreglo
         if (typeof USUARIOS_AUTORIZADOS === 'undefined' || USUARIOS_AUTORIZADOS.length === 0) {
             alert('No se pudo leer el archivo usuarios.js');
             return;
         }
 
-        // Buscar coincidencia en USUARIOS_AUTORIZADOS
         const usuarioEncontrado = USUARIOS_AUTORIZADOS.find(
             u => String(u.usuario).trim() === userInput && String(u.contrasena).trim() === passInput
         );
@@ -134,7 +139,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Cerrar sesión
     logoutButton.addEventListener('click', function() {
         usuarioActual = "";
         formSection.style.display = 'none';
@@ -149,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
     fechaInput.value = `${year}-${mm}-${dd}`;
 
     // -------------------------------------------------------------
-    // 3. ENVÍO DEL FORMULARIO
+    // 4. ENVÍO DEL FORMULARIO A GOOGLE SHEETS
     // -------------------------------------------------------------
     dataForm.addEventListener('submit', function(event) {
         event.preventDefault();
