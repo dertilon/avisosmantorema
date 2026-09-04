@@ -11,27 +11,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Referencias del Formulario
     const ubicacionSelect = document.getElementById('ubicacionTecnica');
-    const codigoSapSelect = document.getElementById('codigoSap');
+    const codigoSapInput = document.getElementById('codigoSapInput');
+    const codigoSapHidden = document.getElementById('codigoSap');
+    const sapDropdownList = document.getElementById('sapDropdownList');
     const fechaInput = document.getElementById('fecha');
     const dataForm = document.getElementById('dataForm');
     const submitButton = document.getElementById('submitButton');
 
     // URLs de Apps Script
-    const URL_DATOS_SHEET = 'https://script.google.com/macros/s/AKfycbz0LWPbHck36KROtykqidL7GMm9YtMCFU0LmBrScnV-8MdFzjzTf7X_vkNtHoGWQtPG/exec';
+    const URL_DATOS_SHEET = 'https://script.google.com/macros/s/AKfycbz0ERYdadHJLRkcS_bIJfLrDEeP-iK_G2XwMJ4QpIuplovy5K1cQX1LXCcqyRUzzK4RoQ/exec';
     const URL_CARGA_AVISOS = 'https://script.google.com/macros/s/AKfycbx6I3SxdliiDcHtR1r-xj6WOALR1Zh60spuV1n2ZSHZylfy8ZAOClaug904EH0md17n/exec';
 
-    let USUARIOS_AUTORIZADOS = [];
+    let LISTA_SAP_GLOBAL = [];
     let usuarioActual = "";
 
-    // 1. CARGA DINÁMICA DE DATOS
+    // 1. CARGA DINÁMICA DE UBICACIONES Y SAP DESDE GOOGLE SHEETS
     async function cargarParametrosDesdeSheets() {
         try {
             const response = await fetch(URL_DATOS_SHEET);
             const data = await response.json();
 
             if (data.status === "success") {
-                USUARIOS_AUTORIZADOS = data.usuarios;
-
+                // Llenar select de ubicaciones
                 ubicacionSelect.innerHTML = '<option value="">Seleccione una ubicación...</option>';
                 data.ubicaciones.forEach(ubi => {
                     const opt = document.createElement('option');
@@ -40,23 +41,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     ubicacionSelect.appendChild(opt);
                 });
 
-                // Llenar select de Códigos SAP combinados
-codigoSapSelect.innerHTML = '<option value="">Código SAP...</option>';
-data.codigosSap.forEach(item => {
-    const opt = document.createElement('option');
-    
-    // Si viene como objeto { codigo, etiqueta }
-    if (typeof item === 'object') {
-        opt.value = item.codigo;        // Guarda el código (ej: 33650)
-        opt.textContent = item.etiqueta; // Muestra en pantalla: 33650 - trapo
-    } else {
-        // Compatibilidad por si viene como texto simple
-        opt.value = item;
-        opt.textContent = item;
-    }
-    
-    codigoSapSelect.appendChild(opt);
-});
+                // Llenar array para el buscador predictivo SAP
+                LISTA_SAP_GLOBAL = data.codigosSap.map(item => {
+                    if (typeof item === 'object') {
+                        return { codigo: item.codigo, etiqueta: item.etiqueta };
+                    }
+                    return { codigo: item, etiqueta: item };
+                });
             }
         } catch (error) {
             console.error("Error al cargar parámetros:", error);
@@ -65,17 +56,68 @@ data.codigosSap.forEach(item => {
 
     cargarParametrosDesdeSheets();
 
-    // 2. VALIDACIÓN DE LOGIN
+    // -------------------------------------------------------------
+    // BUSCADOR PREDICTIVO SAP
+    // -------------------------------------------------------------
+    function renderizarListaSap(filtro = '') {
+        const texto = filtro.toLowerCase().trim();
+        const filtrados = LISTA_SAP_GLOBAL.filter(item => 
+            item.etiqueta.toLowerCase().includes(texto)
+        );
+
+        sapDropdownList.innerHTML = '';
+
+        if (filtrados.length === 0) {
+            sapDropdownList.innerHTML = '<div class="sap-dropdown-item" style="color:#7f8c8d; cursor:default;">No se encontraron repuestos</div>';
+            sapDropdownList.style.display = 'block';
+            return;
+        }
+
+        filtrados.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'sap-dropdown-item';
+            div.textContent = item.etiqueta;
+            div.addEventListener('click', function() {
+                codigoSapInput.value = item.etiqueta;
+                codigoSapHidden.value = item.codigo;
+                sapDropdownList.style.display = 'none';
+            });
+            sapDropdownList.appendChild(div);
+        });
+
+        sapDropdownList.style.display = 'block';
+    }
+
+    codigoSapInput.addEventListener('input', function() {
+        codigoSapHidden.value = this.value;
+        renderizarListaSap(this.value);
+    });
+
+    codigoSapInput.addEventListener('focus', function() {
+        renderizarListaSap(this.value);
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.sap-autocomplete-container')) {
+            sapDropdownList.style.display = 'none';
+        }
+    });
+
+    // -------------------------------------------------------------
+    // 2. VALIDACIÓN DE LOGIN (DESDE USUARIOS.JS)
+    // -------------------------------------------------------------
     loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
         const userInput = String(loginUsuario.value).trim();
         const passInput = String(loginContrasena.value).trim();
 
-        if (USUARIOS_AUTORIZADOS.length === 0) {
-            alert('Sincronizando con Google Sheets, aguarde un instante...');
+        // Verifica que usuarios.js haya cargado el arreglo
+        if (typeof USUARIOS_AUTORIZADOS === 'undefined' || USUARIOS_AUTORIZADOS.length === 0) {
+            alert('No se pudo leer el archivo usuarios.js');
             return;
         }
 
+        // Buscar coincidencia en USUARIOS_AUTORIZADOS
         const usuarioEncontrado = USUARIOS_AUTORIZADOS.find(
             u => String(u.usuario).trim() === userInput && String(u.contrasena).trim() === passInput
         );
@@ -85,7 +127,7 @@ data.codigosSap.forEach(item => {
             loginError.style.display = 'none';
             loginSection.style.display = 'none';
             formSection.style.display = 'block';
-            userGreeting.textContent = `Usuario: ${usuarioActual}`;
+            userGreeting.textContent = `Legajo: ${usuarioActual}`;
             loginForm.reset();
         } else {
             loginError.style.display = 'block';
@@ -99,14 +141,16 @@ data.codigosSap.forEach(item => {
         loginSection.style.display = 'block';
     });
 
-    // Fecha actual por defecto
+    // Fecha actual
     const hoy = new Date();
     const year = hoy.getFullYear();
     const mm = String(hoy.getMonth() + 1).padStart(2, '0');
     const dd = String(hoy.getDate()).padStart(2, '0');
     fechaInput.value = `${year}-${mm}-${dd}`;
 
+    // -------------------------------------------------------------
     // 3. ENVÍO DEL FORMULARIO
+    // -------------------------------------------------------------
     dataForm.addEventListener('submit', function(event) {
         event.preventDefault();
         submitButton.disabled = true;
@@ -121,7 +165,6 @@ data.codigosSap.forEach(item => {
 
         const descripcionTexto = document.getElementById('descripcion').value.trim();
 
-        // Se envía el usuario como campo independiente y en la descripción
         data.usuario = usuarioActual;
         data.descripcion = `${usuarioActual} - ${descripcionTexto}`;
         data.realizado = document.getElementById('realizado').checked ? 'Sí' : 'No';
@@ -130,11 +173,12 @@ data.codigosSap.forEach(item => {
         data.requireAndamio = document.getElementById('requireAndamio').checked ? 'Sí' : 'No';
         data.horas = data.horas ? parseFloat(data.horas) : 0;
         data.hh = data.hh ? parseFloat(data.hh) : 0;
+        data.codigoSap = codigoSapHidden.value || codigoSapInput.value;
 
         if (!data.ubicacionTecnica || !data.titulo || !descripcionTexto) {
             alert('Por favor complete todos los campos obligatorios.');
             submitButton.disabled = false;
-            submitButton.textContent = 'Cargar Aviso';
+            submitButton.textContent = 'CARGAR AVISO';
             return;
         }
 
@@ -156,20 +200,18 @@ data.codigosSap.forEach(item => {
             const result = await response.json();
 
             if (result.status === "success") {
-                // Mostrar el cartel verde de éxito
                 if (mensajeExito) {
                     mensajeExito.style.display = 'block';
-                    // Ocultar automáticamente después de 4 segundos
                     setTimeout(() => {
                         mensajeExito.style.display = 'none';
                     }, 4000);
                 }
 
-                // Resetear campos del formulario
                 dataForm.reset();
                 fechaInput.value = `${year}-${mm}-${dd}`;
                 ubicacionSelect.value = "";
-                codigoSapSelect.value = "";
+                codigoSapInput.value = "";
+                codigoSapHidden.value = "";
             } else {
                 throw new Error(result.message);
             }
@@ -177,8 +219,7 @@ data.codigosSap.forEach(item => {
             alert(`Error al guardar aviso: ${error.message}`);
         } finally {
             submitButton.disabled = false;
-            submitButton.textContent = 'Cargar Aviso';
+            submitButton.textContent = 'CARGAR AVISO';
         }
-    
     }
 });
